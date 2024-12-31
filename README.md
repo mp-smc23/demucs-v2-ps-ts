@@ -19,7 +19,7 @@ sudo apt install -y ffmpeg sox soundstretch
 ```
 
 
-The SI-SDR based model is included in the "demucs/models" folder. The rest are included in "demucs/demucs/models/preliminary" folder, where the preliminary CCMSE, MSE and SISDR models can be found.
+The SI-SDR based model is included in the link below, together with the preliminary models.
 
 The full data set is available upon request. The validation data set and the subset used for training preliminary models can be found here:
 
