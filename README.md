@@ -29,3 +29,5 @@ https://www.dropbox.com/scl/fo/d94zy2qs24l97jy9k7n1d/AD5e_EyqEihlY3W-KVVIQQg?rlk
 ```
 
 The conversation generation script is unfortunately confidential and non-published. Upon request, I can give a demonstration, but it is not available for publication at the time of writing.
+
+Metadata is included for some data sets, including the ones supplied through the link. The code will automatically generate the metadata files, but this takes a while, so for ease of use they are included here.
