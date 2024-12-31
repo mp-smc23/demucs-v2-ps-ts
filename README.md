@@ -1,7 +1,9 @@
 # P9-handin
 Made by Mads Lang Laursen on a project-oriented stay in a collaboration with Aalborg University and GN Hearing.
 
-Code is based on Demucs V2. Please refer to the report for relevant descriptions, comments, and references. 
+Code is based on Demucs V2. The original readme is included in this folder as README-original.md.
+
+Please refer to the report for relevant descriptions, comments, and references. 
 
 ### Running the code:
 Please install the Conda environment by,
