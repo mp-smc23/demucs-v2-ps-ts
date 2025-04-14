@@ -1,9 +1,9 @@
-# P9-handin
-Made by Mads Lang Laursen on a project-oriented stay in a collaboration with Aalborg University and GN Hearing.
+# Demucs-v2-ps-ts
+This repository is based on the [P9-handin repository](https://github.com/madslangl/P9-handin) created by Mads Lang Laursen. 
 
-Code is based on Demucs V2. The original readme is included in this folder as README-original.md.
+Code is originally based on Demucs V2. The original readme is included in this folder as README-original.md.
 
-Please refer to the report for relevant descriptions, comments, and references. 
+In addition to the original repository, this version includes new models that have been added to extend its functionality.
 
 ### Running the code:
 Please install the Conda environment by,
@@ -11,23 +11,17 @@ Please install the Conda environment by,
 conda env create -f environment.yml
 ```
 
-This creates a conda evnvironment named demucs2-0-3, which should be activated by:
+This creates a conda environment named demucs2-0-3, which should be activated by:
 ```cmd
 conda activate demucs2-0-3
 ```
-This includes all relevant software, **except** for ffmpeg, sox and soundstrech which should be installed by:
+This includes all relevant software, **except** for ffmpeg, sox, and soundstretch which should be installed by:
 ```cmd
 sudo apt install -y ffmpeg sox soundstretch
 ```
 
-The SI-SDR based model is included in the link below, together with the preliminary models. They are fairly big, so not suitable for storing on Github. 
+The SI-SDR based model is included in models directory as git LFS object.
 
-The full data set is available upon request. The validation data set and the subset used for training preliminary models can be found here:
+The conversation generation script is confidential and non-published.
 
-```link
-https://www.dropbox.com/scl/fo/d94zy2qs24l97jy9k7n1d/AD5e_EyqEihlY3W-KVVIQQg?rlkey=bnjarmetrn09yernwypy6jdq0&st=7jzj2kqj&dl=0
-```
-
-The conversation generation script is unfortunately confidential and non-published. Upon request, I can give a demonstration, but it is not available for publication at the time of writing.
-
-Metadata is included for some data sets, including the ones supplied through the link. The code will automatically generate the metadata files, but this takes a while, so for ease of use they are included here.
+Metadata is included for some datasets. The code will automatically generate the metadata files, but this takes a while, so for ease of use they are included here.
