@@ -188,16 +188,13 @@ def main():
     print("Agumentation pipeline:", augment)
 
     if args.mse:
-        criterion = nn.MSELoss()
-        
+        criterion = nn.MSELoss()    
     elif args.ccmse:
         criterion = CCMSE(fft_size=1024, shift_size=120, win_length=600, window="hann_window", alpha=args.alpha, c=args.comp_factor)
     elif args.SISDR:
         criterion = SI_SDR()
-
     elif args.silenceWeightedMSE:
         criterion = SilenceWeightedMSELoss(silence_threshold=0.01, silence_weight=0.1)
-
     else:
         criterion = nn.L1Loss()
 
