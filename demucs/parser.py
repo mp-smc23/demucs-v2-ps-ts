@@ -255,7 +255,7 @@ def get_name(parser, args):
             else:
                 parts.append(f"{name}={value}")
     if parts:
-        name = " ".join(parts)
+        name = "_".join(parts)
     else:
         name = "default"
     return name
