@@ -2,3 +2,4 @@ demucs_original/*
 checkpoints/*
 __pycache__/*
 logs/*
+demucs/__pycache__/*
