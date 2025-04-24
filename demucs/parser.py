@@ -145,7 +145,7 @@ def get_parser():
     parser.add_argument("--lstm_layers", type=int, default=2, help="Number of layers for the LSTM")
     parser.add_argument("--channels",
                         type=int,
-                        default=64,
+                        default=32,
                         help="Number of channels for the first encoder layer")
     parser.add_argument("--kernel_size",
                         type=int,
