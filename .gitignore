@@ -3,3 +3,4 @@ checkpoints/*
 __pycache__/*
 logs/*
 demucs/__pycache__/*
+separated/*
