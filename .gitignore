@@ -1,7 +1,7 @@
 demucs_original/*
 checkpoints/*
 __pycache__/*
-logs/*
+logs/*.done
 demucs/__pycache__/*
 separated/*
 slurm-*
