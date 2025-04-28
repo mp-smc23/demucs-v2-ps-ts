@@ -144,7 +144,7 @@ def main():
         return
 
     try:
-        saved = th.load(checkpoint, map_location='cpu')
+        saved = th.load(checkpoint, map_location='cpu', weights_only=False)
     except IOError:
         saved = SavedState()
 

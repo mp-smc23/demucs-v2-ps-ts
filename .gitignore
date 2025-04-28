@@ -4,3 +4,4 @@ __pycache__/*
 logs/*
 demucs/__pycache__/*
 separated/*
+slurm-*
