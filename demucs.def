@@ -1,0 +1,26 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/pytorch:25.01-py3
+
+%files
+    /ceph/home/student.aau.dk/xg64zo/smc10/requirements.txt /scratch/xg64zo/tmp/requirements.txt    
+
+%post
+    # Set a custom temporary directory (adjust the path as needed)
+    export TMPDIR=/scratch/xg64zo/tmp
+    mkdir -p $TMPDIR
+
+    apt-get update
+    apt-get upgrade -y
+
+    # Install Python and pip
+    apt-get install -y --no-install-recommends build-essential ffmpeg python3 python3-pip soundstretch
+
+    # Upgrade pip using no-cache-dir
+    pip install --no-cache-dir --upgrade pip
+
+    # Install Python libraries without caching
+    pip install --no-cache-dir -r /scratch/xg64zo/tmp/requirements.txt
+
+%test
+    # Test Python version1~# Test Python version
+    python3 --version
