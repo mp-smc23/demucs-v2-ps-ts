@@ -139,6 +139,10 @@ def main():
 
     if args.show:
         print(model)
+        
+        for property, value in vars(model).items():
+            print(property, ":", value)
+            
         size = sizeof_fmt(4 * sum(p.numel() for p in model.parameters()))
         print(f"Model size {size}")
         return
