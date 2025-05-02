@@ -47,14 +47,15 @@ def train_model(epoch,
     current_loss = 0
     model_size = 0
     
+    batch_size //= world_size
+    
     for subset_idx, subset in enumerate(subsets):
         if world_size > 1:
-            sampler = DistributedSampler(dataset)
+            sampler = DistributedSampler(subset)
             sampler_epoch = epoch * repeat
             if seed is not None:
                 sampler_epoch += seed * 1000
             sampler.set_epoch(sampler_epoch)
-            batch_size //= world_size
             loader = DataLoader(subset, batch_size=batch_size, sampler=sampler, num_workers=workers)
         else:
             loader = DataLoader(subset, batch_size=batch_size, num_workers=workers, shuffle=True)

@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=train_demucs_mse   # Job name
+#SBATCH --job-name=gpu_sisdr_ps   # Job name
 #SBATCH --ntasks=1                      # Number of tasks
-#SBATCH --gres=gpu:1                    # Request 1 GPU
+#SBATCH --gres=gpu:8                    # Request 8 GPU
 #SBATCH --cpus-per-task=16              # Number of CPU cores per task
 #SBATCH --mem=24G                       # Memory
 #SBATCH --time=12:00:00 # Timeout
@@ -50,4 +50,4 @@ trap 'term_handler' SIGTERM
 
 # Run Singularity and execute commands inside the container
 
-srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./../demucs.sif python3 -m demucs -b 4 -e 150 --mse --repeat 1 --no_augment --wav /ceph/home/student.aau.dk/xg64zo/smc10/noaug --musdb /ceph/home/student.aau.dk/xg64zo/smc10/noaug
+srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./../demucs.sif python3 run.py -b 32 -e 30 --SISDR --repeat 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/noaug --musdb /ceph/home/student.aau.dk/xg64zo/smc10/noaug
