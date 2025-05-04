@@ -247,7 +247,7 @@ def load_model(path, strict=False):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         load_from = path
-        package = th.load(load_from, 'cpu')
+        package = th.load(load_from, 'cpu', weights_only=False)
 
     klass = package["klass"]
     args = package["args"]
