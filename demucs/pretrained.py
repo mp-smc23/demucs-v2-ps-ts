@@ -27,7 +27,7 @@ PRETRAINED_MODELS = {
     'demucs_unittest': '09ebc15f',
 }
 
-SOURCES = ["spk1", "spk2", "spk3"]
+SOURCES = ["spk1", "spk2"]
 
 
 def get_url(name):
