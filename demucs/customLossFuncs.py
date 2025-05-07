@@ -3,6 +3,7 @@
 import torch.nn.functional as F
 import torch.nn as nn
 import torch as th
+from itertools import permutations
 
 from .parser import get_parser
 
@@ -199,15 +200,16 @@ class SI_SDR(th.nn.Module):
         super(SI_SDR, self).__init__()
         self.epsilon = epsilon
 
-    def forward(self, y, y_target):
+    def si_sdr_loss(self, y, y_target):
+        """Compute SI-SDR loss for a single pair of signals."""
         y = y - y.mean(dim=-1, keepdim=True)
         y_target = y_target - y_target.mean(dim=-1, keepdim=True)
         
-        s_target_num = th.sum(y * y_target, dim=-1, keepdim=True) * y
-        s_target_den = th.sum(y ** 2, dim=-1, keepdim=True) + self.epsilon
+        s_target_num = th.sum(y * y_target, dim=-1, keepdim=True) * y_target
+        s_target_den = th.sum(y_target ** 2, dim=-1, keepdim=True) + self.epsilon
         s_target = s_target_num / s_target_den
         
-        e_noise = y_target - s_target
+        e_noise = y - s_target
         
         s_target_energy = th.sum(s_target ** 2, dim=-1, keepdim=True)
         e_noise_energy = th.sum(e_noise ** 2, dim=-1, keepdim=True)
@@ -215,6 +217,81 @@ class SI_SDR(th.nn.Module):
         s_target_energy = th.clamp(s_target_energy, min=self.epsilon)
         e_noise_energy = th.clamp(e_noise_energy, min=self.epsilon)
         
-        SI_SDR = 10 * th.log10(s_target_energy / e_noise_energy)
+        si_sdr = 10 * th.log10(s_target_energy / e_noise_energy)
         
-        return -SI_SDR.mean()
+        return -si_sdr.mean()
+
+    def forward(self, y, y_target):
+        """Permutation-invariant SI-SDR loss.
+
+        Args:
+            y (Tensor): Predicted signal (B, S, T), where S is the number of speakers.
+            y_target (Tensor): Groundtruth signal (B, S, T).
+
+        Returns:
+            Tensor: Minimum SI-SDR loss across all permutations.
+        """
+        batch_size, num_speakers, _ = y.shape
+        perms = list(permutations(range(num_speakers)))
+        min_loss = None
+
+        for perm in perms:
+            loss = 0
+            for i, j in enumerate(perm):
+                loss += self.si_sdr_loss(y[:, i, :], y_target[:, j, :])
+            loss = loss / num_speakers
+
+            if min_loss is None or loss < min_loss:
+                min_loss = loss
+
+        return min_loss
+
+
+class PIT_SI_SDR(th.nn.Module):
+    def __init__(self, epsilon=1e-8):
+        super().__init__()
+        self.epsilon = epsilon
+
+    def forward(self, preds, targets):
+        """
+        Compute permutation-invariant SI-SDR loss.
+
+        Args:
+            preds: Tensor of shape (B, N, T) - predicted signals
+            targets: Tensor of shape (B, N, T) - ground truth signals
+                     where B = batch size, N = number of sources, T = time steps
+
+        Returns:
+            Scalar loss (negative SI-SDR averaged over best permutation)
+        """
+        B, N, T = preds.shape
+        assert preds.shape == targets.shape, "Shape mismatch between preds and targets"
+
+        # Normalize to zero-mean
+        preds = preds - preds.mean(dim=2, keepdim=True)
+        targets = targets - targets.mean(dim=2, keepdim=True)
+
+        # Calculate pairwise SI-SDR between each prediction-target pair
+        # preds: (B, N, T), targets: (B, N, T)
+        pairwise_si_sdr = []
+
+        for perm in permutations(range(N)):
+            permuted_targets = targets[:, perm, :]  # (B, N, T)
+            s_target = th.sum(preds * permuted_targets, dim=2, keepdim=True) * permuted_targets
+            s_target = s_target / (th.sum(permuted_targets ** 2, dim=2, keepdim=True) + self.epsilon)
+
+            e_noise = preds - s_target
+
+            s_target_energy = th.sum(s_target ** 2, dim=2)
+            e_noise_energy = th.sum(e_noise ** 2, dim=2)
+
+            si_sdr = 10 * th.log10((s_target_energy + self.epsilon) / (e_noise_energy + self.epsilon))
+            pairwise_si_sdr.append(si_sdr.mean(dim=1))  # shape: (B,)
+
+        # Stack SI-SDR for all permutations: shape (n_perms, B)
+        si_sdr_all = th.stack(pairwise_si_sdr, dim=0)
+
+        # Max SI-SDR (i.e., min loss) across permutations per example
+        max_sisdr, _ = si_sdr_all.max(dim=0)
+
+        return -max_sisdr.mean()  # Negative because we want to *maximize* SI-SDR

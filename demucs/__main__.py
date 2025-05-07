@@ -30,7 +30,7 @@ from demucs.train import train_model, validate_model
 from demucs.utils import (human_seconds, load_model, save_model, get_state,
                     save_state, sizeof_fmt, get_quantizer)
 from demucs.wav import get_wav_datasets, get_musdb_wav_datasets
-from demucs.customLossFuncs import SilenceWeightedMSELoss, CCMSE, SI_SDR
+from demucs.customLossFuncs import SilenceWeightedMSELoss, CCMSE, SI_SDR, PIT_SI_SDR
 
 @dataclass
 class SavedState:
@@ -139,10 +139,6 @@ def main():
 
     if args.show:
         print(model)
-        
-        for property, value in vars(model).items():
-            print(property, ":", value)
-            
         size = sizeof_fmt(4 * sum(p.numel() for p in model.parameters()))
         print(f"Model size {size}")
         return
@@ -196,7 +192,7 @@ def main():
     elif args.ccmse:
         criterion = CCMSE(fft_size=1024, shift_size=120, win_length=600, window="hann_window", alpha=args.alpha, c=args.comp_factor)
     elif args.SISDR:
-        criterion = SI_SDR()
+        criterion = PIT_SI_SDR()
     elif args.silenceWeightedMSE:
         criterion = SilenceWeightedMSELoss(silence_threshold=0.01, silence_weight=0.1)
     else:
