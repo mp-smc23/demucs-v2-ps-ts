@@ -257,36 +257,39 @@ class PIT_SI_SDR(th.nn.Module):
         Compute permutation-invariant SI-SDR loss.
 
         Args:
-            preds: Tensor of shape (B, N, T) - predicted signals
-            targets: Tensor of shape (B, N, T) - ground truth signals
-                     where B = batch size, N = number of sources, T = time steps
+            preds: Tensor of shape (B, N, C, T) or (B, N, T) - predicted signals
+            targets: Tensor of shape (B, N, C, T) or (B, N, T) - ground truth signals
+                     where B = batch size, N = number of sources, C = channels (optional), T = time steps
 
         Returns:
             Scalar loss (negative SI-SDR averaged over best permutation)
         """
-        B, N, T = preds.shape
+        if preds.dim() == 3:  # If input is (B, N, T), add a channel dimension
+            preds = preds.unsqueeze(2)  # (B, N, 1, T)
+            targets = targets.unsqueeze(2)  # (B, N, 1, T)
+
+        B, N, C, T = preds.shape
         assert preds.shape == targets.shape, "Shape mismatch between preds and targets"
 
-        # Normalize to zero-mean
-        preds = preds - preds.mean(dim=2, keepdim=True)
-        targets = targets - targets.mean(dim=2, keepdim=True)
+        # Normalize to zero-mean along the time dimension
+        preds = preds - preds.mean(dim=3, keepdim=True)
+        targets = targets - targets.mean(dim=3, keepdim=True)
 
         # Calculate pairwise SI-SDR between each prediction-target pair
-        # preds: (B, N, T), targets: (B, N, T)
         pairwise_si_sdr = []
 
         for perm in permutations(range(N)):
-            permuted_targets = targets[:, perm, :]  # (B, N, T)
-            s_target = th.sum(preds * permuted_targets, dim=2, keepdim=True) * permuted_targets
-            s_target = s_target / (th.sum(permuted_targets ** 2, dim=2, keepdim=True) + self.epsilon)
+            permuted_targets = targets[:, perm, :, :]  # (B, N, C, T)
+            s_target = th.sum(preds * permuted_targets, dim=3, keepdim=True) * permuted_targets
+            s_target = s_target / (th.sum(permuted_targets ** 2, dim=3, keepdim=True) + self.epsilon)
 
             e_noise = preds - s_target
 
-            s_target_energy = th.sum(s_target ** 2, dim=2)
-            e_noise_energy = th.sum(e_noise ** 2, dim=2)
+            s_target_energy = th.sum(s_target ** 2, dim=3)
+            e_noise_energy = th.sum(e_noise ** 2, dim=3)
 
             si_sdr = 10 * th.log10((s_target_energy + self.epsilon) / (e_noise_energy + self.epsilon))
-            pairwise_si_sdr.append(si_sdr.mean(dim=1))  # shape: (B,)
+            pairwise_si_sdr.append(si_sdr.mean(dim=(1, 2)))  # shape: (B,)
 
         # Stack SI-SDR for all permutations: shape (n_perms, B)
         si_sdr_all = th.stack(pairwise_si_sdr, dim=0)
