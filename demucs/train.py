@@ -78,6 +78,10 @@ def train_model(epoch,
 
             estimates = model(mix)
             sources = center_trim(sources, estimates)
+            if sources.dim() == 4:
+                # for 2D conv models
+                estimates = estimates.squeeze(2)
+                sources = sources.squeeze(2)
             loss = criterion(estimates, sources)
             model_size = 0
             if quantizer is not None:
