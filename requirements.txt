@@ -7,3 +7,4 @@ soundfile
 treetable>=0.2.3
 torchaudio>=0.8
 tqdm>=4.36
+asteroid
