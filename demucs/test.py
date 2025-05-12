@@ -14,9 +14,11 @@ import torch as th
 import tqdm
 from scipy.io import wavfile
 from torch import distributed
+from asteroid.metrics import get_metrics
 
 from .audio import convert_audio
 from .utils import apply_model
+import pandas as pd
 
 
 def evaluate(model,
@@ -107,3 +109,43 @@ def evaluate(model,
                 gzip.open(json_path, "w").write(track_store.json.encode('utf-8'))
     if world_size > 1:
         distributed.barrier()
+
+
+def evaluate_2(dataset,
+                   model,
+                   eval_folder,
+                   device="cpu",
+                   rank=0,
+                   world_size=1,
+                   shifts=0,
+                   overlap=0.25,
+                   split=False):
+    indexes = range(rank, len(dataset), world_size)
+
+    tq = tqdm.tqdm(indexes,
+                   ncols=120,
+                   desc=f"[{epoch:03d}] test",
+                   leave=False,
+                   file=sys.stdout,
+                   unit=" track")
+    
+    with th.no_grad():
+        df = pd.DataFrame({});
+        
+        for index in tq:
+            streams = dataset[index]
+            # first five minutes to avoid OOM on --upsample models
+            streams = streams[..., :15_000_000]
+            streams = streams.to(device)
+            sources = streams[1:]
+            mix = streams[0]    
+            estimates = apply_model(model, mix, shifts=shifts, split=split, overlap=overlap)
+            metrics_dict = get_metrics(mix, sources, estimates, sample_rate=16000, metrics_list='all', average=False)
+            metrics_dict["id"] = index
+            
+            df = pd.concat([df, pd.DataFrame([metrics_dict])], ignore_index=True);
+            
+    output_dir = eval_folder / "results"
+    output_dir.mkdir(exist_ok=True, parents=True)
+    df.to_csv(output_dir / "metrics.csv", index=False)
+    

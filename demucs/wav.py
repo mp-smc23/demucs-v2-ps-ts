@@ -212,6 +212,21 @@ def get_wav_datasets(args, samples, sources):
                        normalize=args.norm_wav)
     return train_set, valid_set
 
+def get_wav_datasets_test(args, sources):
+    test_path = args.wav / "test"
+    sig = hashlib.sha1(str(test_path).encode()).hexdigest()[:8]
+    metadata_file = args.metadata / (sig + ".json")
+    if not metadata_file.is_file() and args.rank == 0:
+        test = _build_metadata(test_path, sources)
+        json.dump([test], open(metadata_file, "w"))
+    if args.world_size > 1:
+        distributed.barrier()
+    test = json.load(open(metadata_file))
+    test_set = Wavset(test_path, test, [MIXTURE] + sources,
+                       samplerate=args.samplerate, channels=args.audio_channels,
+                       normalize=args.norm_wav)
+    
+    return test_set
 
 def get_musdb_wav_datasets(args, samples, sources):
     metadata_file = args.metadata / "musdb_wav.json"

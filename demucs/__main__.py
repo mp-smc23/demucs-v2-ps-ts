@@ -25,13 +25,13 @@ from demucs.raw import Rawset
 from demucs.repitch import RepitchedWrapper
 from demucs.pretrained import load_pretrained, SOURCES
 from demucs.tasnet import ConvTasNet
-from demucs.test import evaluate
+from demucs.test import evaluate, evaluate_2
 from demucs.train import train_model, validate_model
 from demucs.utils import (human_seconds, load_model, save_model, get_state,
                     save_state, sizeof_fmt, get_quantizer)
-from demucs.wav import get_wav_datasets, get_musdb_wav_datasets
+from demucs.wav import get_wav_datasets, get_musdb_wav_datasets, get_wav_datasets_test
 from demucs.customLossFuncs import SilenceWeightedMSELoss, CCMSE, SI_SDR, PIT_SI_SDR
-from asteroid.losses import PITLossWrapper, pairwise_neg_sisdr
+from asteroid.losses import PITLossWrapper, multisrc_neg_sisdr, multisrc_mse
 
 @dataclass
 class SavedState:
@@ -163,8 +163,8 @@ def main():
     if args.save_model:
         if args.rank == 0:
             model.to("cpu")
-            assert saved.best_state is not None, "model needs to train for 1 epoch at least."
-            model.load_state_dict(saved.best_state)
+            assert saved.last_state is not None, "model needs to train for 1 epoch at least."
+            model.load_state_dict(saved.last_state)
             save_model(model, quantizer, args, args.models / model_name)
         return
     elif args.save_state:
@@ -189,11 +189,13 @@ def main():
     print("Agumentation pipeline:", augment)
 
     if args.mse:
-        criterion = nn.MSELoss()    
+        criterion = PITLossWrapper(multisrc_mse, pit_from='pw_pt')
     elif args.ccmse:
         criterion = CCMSE(fft_size=1024, shift_size=120, win_length=600, window="hann_window", alpha=args.alpha, c=args.comp_factor)
     elif args.SISDR:
         criterion = PITLossWrapper(loss_func=pairwise_neg_sisdr, pit_from="pw_mtx")
+    elif args.PITSISDR:
+        criterion = PITLossWrapper(loss_func=multisrc_neg_sisdr, pit_from='perm_avg')
     elif args.silenceWeightedMSE:
         criterion = SilenceWeightedMSELoss(silence_threshold=0.01, silence_weight=0.1)
     else:
@@ -268,7 +270,7 @@ def main():
             diffq=args.diffq,
             workers=args.workers,
             world_size=args.world_size)
-        model.eval()
+        # model.eval()
         valid_loss = validate_model(
             epoch, valid_set, model, criterion,
             device=device,
@@ -327,21 +329,13 @@ def main():
         distributed.barrier()
 
     del dmodel
-    model.load_state_dict(saved.best_state)
+    model.load_state_dict(saved.last_state)
     if args.eval_cpu:
         device = "cpu"
         model.to(device)
     model.eval()
-    evaluate(model, args.musdb, eval_folder,
-             is_wav=args.is_wav,
-             rank=args.rank,
-             world_size=args.world_size,
-             device=device,
-             save=args.save,
-             split=args.split_valid,
-             shifts=args.shifts,
-             overlap=args.overlap,
-             workers=args.eval_workers)
+    test_set = get_wav_datasets_test(args, model.sources)
+    evaluate_2(test_set, model, eval_folder)
     model.to("cpu")
     if args.rank == 0:
         if not (args.test or args.test_pretrained):
