@@ -329,7 +329,7 @@ def main():
         distributed.barrier()
 
     del dmodel
-    model.load_state_dict(saved.last_state)
+    model.load_state_dict(saved.last_state) # last state is not always the best one 
     if args.eval_cpu:
         device = "cpu"
         model.to(device)

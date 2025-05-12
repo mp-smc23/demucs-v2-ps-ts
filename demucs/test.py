@@ -121,7 +121,7 @@ def evaluate_2(dataset,
                    overlap=0.25,
                    split=False):
     indexes = range(rank, len(dataset), world_size)
-
+    epoch = 0
     tq = tqdm.tqdm(indexes,
                    ncols=120,
                    desc=f"[{epoch:03d}] test",

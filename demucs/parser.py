@@ -101,6 +101,7 @@ def get_parser():
     parser.add_argument("--mse", action="store_true", help="Use MSE")
     parser.add_argument("--ccmse", action="store_true", help="Use CCMSE (complex stft mse)")
     parser.add_argument("--SISDR", action="store_true", help="Use SI-SDR loss")
+    parser.add_argument("--PITSISDR", action="store_true", help="Use PIT SI-SDR loss")
     parser.add_argument("--l1", action="store_true", help="Use L1 (mae)")
     parser.add_argument("--silenceWeightedMSE", action="store_true", help="Use silence weighted MSE")
 
