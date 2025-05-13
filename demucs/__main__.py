@@ -30,7 +30,7 @@ from demucs.train import train_model, validate_model
 from demucs.utils import (human_seconds, load_model, save_model, get_state,
                     save_state, sizeof_fmt, get_quantizer)
 from demucs.wav import get_wav_datasets, get_musdb_wav_datasets, get_wav_datasets_test
-from demucs.customLossFuncs import SilenceWeightedMSELoss, CCMSE, SI_SDR, PIT_SI_SDR
+from demucs.customLossFuncs import SilenceWeightedMSELoss, CCMSE, SI_SDR
 from asteroid.losses import PITLossWrapper, multisrc_neg_sisdr, multisrc_mse, pairwise_neg_sisdr
 
 @dataclass
@@ -193,7 +193,7 @@ def main():
     elif args.ccmse:
         criterion = CCMSE(fft_size=1024, shift_size=120, win_length=600, window="hann_window", alpha=args.alpha, c=args.comp_factor)
     elif args.SISDR:
-        criterion = PITLossWrapper(loss_func=pairwise_neg_sisdr, pit_from="pw_mtx")
+        criterion = SI_SDR()
     elif args.PITSISDR:
         criterion = PITLossWrapper(loss_func=multisrc_neg_sisdr, pit_from='perm_avg')
     elif args.silenceWeightedMSE:
