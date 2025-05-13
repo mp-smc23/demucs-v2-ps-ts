@@ -140,7 +140,23 @@ def evaluate_2(dataset,
             sources = streams[1:]
             mix = streams[0]    
             estimates = apply_model(model, mix, shifts=shifts, split=split, overlap=overlap)
-            metrics_dict = get_metrics(mix, sources, estimates, sample_rate=16000, metrics_list='all', average=False)
+            
+            if estimates.dim() == 3:
+                estimates = estimates.squeeze(1)
+            if mix.dim() == 3:
+                mix = mix.squeeze(1)
+            if sources.dim() == 3:
+                sources = sources.squeeze(1)
+            
+            mix_np = mix.cpu().numpy()
+            sources_np = sources.cpu().numpy()
+            estimates_np = estimates.cpu().numpy()
+            
+            print(f"mix shape: {mix.shape}")
+            print(f"sources shape: {sources.shape}")
+            print(f"estimates shape: {estimates.shape}")
+                
+            metrics_dict = get_metrics(mix_np, sources_np, estimates_np, sample_rate=16000, metrics_list='all')
             metrics_dict["id"] = index
             
             df = pd.concat([df, pd.DataFrame([metrics_dict])], ignore_index=True);

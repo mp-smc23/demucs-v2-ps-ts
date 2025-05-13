@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=eg_red_noaug                # Job name
+#SBATCH --job-name=test_model                # Job name
 #SBATCH --ntasks=1                      # Number of tasks
 #SBATCH --gres=gpu:1                    # Request 8 GPU
 #SBATCH --cpus-per-task=16              # Number of CPU cores per task

@@ -31,7 +31,7 @@ from demucs.utils import (human_seconds, load_model, save_model, get_state,
                     save_state, sizeof_fmt, get_quantizer)
 from demucs.wav import get_wav_datasets, get_musdb_wav_datasets, get_wav_datasets_test
 from demucs.customLossFuncs import SilenceWeightedMSELoss, CCMSE, SI_SDR, PIT_SI_SDR
-from asteroid.losses import PITLossWrapper, multisrc_neg_sisdr, multisrc_mse
+from asteroid.losses import PITLossWrapper, multisrc_neg_sisdr, multisrc_mse, pairwise_neg_sisdr
 
 @dataclass
 class SavedState:
@@ -270,7 +270,7 @@ def main():
             diffq=args.diffq,
             workers=args.workers,
             world_size=args.world_size)
-        # model.eval()
+        model.eval()
         valid_loss = validate_model(
             epoch, valid_set, model, criterion,
             device=device,
@@ -330,13 +330,13 @@ def main():
 
     del dmodel
     model.load_state_dict(saved.last_state) # last state is not always the best one 
-    if args.eval_cpu:
-        device = "cpu"
-        model.to(device)
+    
+    device = "cpu"
+    model.to(device)
     model.eval()
     test_set = get_wav_datasets_test(args, model.sources)
-    evaluate_2(test_set, model, eval_folder)
-    model.to("cpu")
+    evaluate_2(test_set, model, eval_folder, device="cpu")
+
     if args.rank == 0:
         if not (args.test or args.test_pretrained):
             save_model(model, quantizer, args, args.models / model_name)

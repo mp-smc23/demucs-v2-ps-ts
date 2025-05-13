@@ -213,7 +213,7 @@ def get_wav_datasets(args, samples, sources):
     return train_set, valid_set
 
 def get_wav_datasets_test(args, sources):
-    test_path = args.wav / "valid" # TODO change to test
+    test_path = args.musdb / "test" 
     sig = hashlib.sha1(str(test_path).encode()).hexdigest()[:8]
     metadata_file = args.metadata / (sig + ".json")
     if not metadata_file.is_file() and args.rank == 0:
