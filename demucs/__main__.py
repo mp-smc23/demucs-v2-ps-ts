@@ -233,10 +233,12 @@ def main():
     print("Train set and valid set sizes", len(train_set), len(valid_set))
 
     if args.repitch:
+        mode = "resample" if args.resample else "pv"
         train_set = RepitchedWrapper(
             train_set,
             proba=args.repitch,
-            max_tempo=args.max_tempo)
+            max_tempo=args.max_tempo,
+            mode=mode)
 
     best_loss = float("inf")
     

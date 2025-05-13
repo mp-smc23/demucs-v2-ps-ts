@@ -114,9 +114,10 @@ def get_parser():
                         dest="augment",
                         default=True,
                         help="No basic data augmentation.")
-    parser.add_argument("--repitch", type=float, default=0.2,
+    parser.add_argument("--repitch", type=float, default=0.5,
                         help="Probability to do tempo/pitch change")
-    parser.add_argument("--max_tempo", type=float, default=12,
+    parser.add_argument("--resample", action="store_true", help="Use resampling for tempo change")
+    parser.add_argument("--max_tempo", type=float, default=25,
                         help="Maximum relative tempo change in %% when using repitch.")
 
     parser.add_argument("--remix_group_size",
