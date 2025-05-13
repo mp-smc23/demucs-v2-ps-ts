@@ -55,7 +55,7 @@ class RepitchedWrapper:
                     x = librosa.effects.pitch_shift(x, sr=16000, n_steps=delta_pitch)
                     x = tsm.phase_vocoder(x, stretch_factor, phase_lock=True)
                 stream = torch.from_numpy(x).t()
-                outs.append(stream[:, :out_length])
+                outs.append(stream[:out_length])
             streams = torch.stack(outs)
         else:
             streams = streams[..., :out_length]
