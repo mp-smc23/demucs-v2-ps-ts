@@ -19,4 +19,4 @@ mkdir -p logs/noaug_${SLURM_JOB_ID}
 
 # Run Singularity and execute commands inside the container
 
-srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./../demucs_asteroid.sif python3 -m demucs --test pitsisdr-noaug-last.th -b 16 --PITSISDR --repeat 1 --repitch 0 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/noaug --musdb /ceph/home/student.aau.dk/xg64zo/smc10/noaug
+srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./demucs.sif python3 -m demucs --test mads-noaug.th -b 16 --repeat 1 --repitch 0 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/mad --musdb /ceph/home/student.aau.dk/xg64zo/smc10/old_convs/noaug

@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=mads_sisdr           # Job name
+#SBATCH --job-name=ps_mads           # Job name
 #SBATCH --ntasks=1                      # Number of tasks
 #SBATCH --gres=gpu:8                    # Request 8 GPU
-#SBATCH --cpus-per-task=32              # Number of CPU cores per task
+#SBATCH --cpus-per-task=16              # Number of CPU cores per task
 #SBATCH --mem=24G                       # Memory
 #SBATCH --time=12:00:00 # Timeout
 #SBATCH --signal=B:SIGTERM@30
@@ -50,4 +50,4 @@ trap 'term_handler' SIGTERM
 
 # Run Singularity and execute commands inside the container
 
-srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./../demucs.sif python3 run.py -b 128 -e 120 --SISDR --repeat 1 --repitch 0.5 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/mad --musdb /ceph/home/student.aau.dk/xg64zo/smc10/old_convs/noaug/test
+srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./demucs.sif python3 run.py -b 128 -e 120 --SISDR --repeat 1 --repitch 0.5 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/mad --musdb /ceph/home/student.aau.dk/xg64zo/smc10/old_convs/noaug

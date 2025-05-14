@@ -152,9 +152,9 @@ def evaluate_2(dataset,
             sources_np = sources.cpu().numpy()
             estimates_np = estimates.cpu().numpy()
             
-            print(f"mix shape: {mix.shape}")
-            print(f"sources shape: {sources.shape}")
-            print(f"estimates shape: {estimates.shape}")
+            if sources_np.shape[0] > 5:
+                sources_np = sources_np[:5, ...]
+                estimates_np = estimates_np[:5, ...]
                 
             metrics_dict = get_metrics(mix_np, sources_np, estimates_np, sample_rate=16000, metrics_list='all')
             metrics_dict["id"] = index

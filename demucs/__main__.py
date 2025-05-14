@@ -104,10 +104,16 @@ def main():
         checkpoint.unlink()
 
     if args.test or args.test_pretrained:
-        args.epochs = 1
+        args.epochs = 0
         args.repeat = 0
         if args.test:
             model = load_model(args.models / args.test)
+            device = "cpu"
+            model.to(device)
+            model.eval()
+            test_set = get_wav_datasets_test(args, model.sources)
+            evaluate_2(test_set, model, eval_folder, device="cpu")
+            return
         else:
             model = load_pretrained(args.test_pretrained)
     elif args.tasnet:
