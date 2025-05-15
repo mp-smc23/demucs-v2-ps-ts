@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=mads_sisdr           # Job name
+#SBATCH --job-name=mads_res           # Job name
 #SBATCH --ntasks=1                      # Number of tasks
 #SBATCH --gres=gpu:8                    # Request 8 GPU
 #SBATCH --cpus-per-task=16              # Number of CPU cores per task
