@@ -8,3 +8,4 @@ demucs/__pycache__/*
 separated/*
 slurm-*
 .DS_Store
+*.sif
