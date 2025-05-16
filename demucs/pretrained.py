@@ -26,8 +26,8 @@ PRETRAINED_MODELS = {
     'tasnet_extra': 'df3777b2',
     'demucs_unittest': '09ebc15f',
 }
-
 SOURCES = ["spk1", "spk2", "spk3"]
+# SOURCES = ["spk1", "spk2", "spk3", "spk4", "spk5", "spk6", "spk7"]
 
 
 def get_url(name):
