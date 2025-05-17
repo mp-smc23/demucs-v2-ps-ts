@@ -49,5 +49,5 @@ trap 'term_handler' SIGTERM
 
 # Run Singularity and execute commands inside the container
 
-srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./../demucs_asteroid.sif python3 run.py -b 128 -e 150 --PITSISDR --repeat 1 --repitch 0 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/noaug --musdb /ceph/home/student.aau.dk/xg64zo/smc10/noaug
-# srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./../demucs_asteroid.sif python3 -m demucs -b 4 -e 29 --SISDR --repeat 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/noaug --musdb /ceph/home/student.aau.dk/xg64zo/smc10/noaug
+srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./demucs.sif python3 run.py -b 128 -e 120 --no_norm_wav --PITSISDR --repeat 1 --repitch 0 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/noaug --musdb /ceph/home/student.aau.dk/xg64zo/smc10/noaug
+# srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./demucs.sif python3 -m demucs -b 4 -e 29 --SISDR --repeat 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/noaug --musdb /ceph/home/student.aau.dk/xg64zo/smc10/noaug
