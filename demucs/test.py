@@ -120,7 +120,7 @@ def evaluate_2(dataset,
                    shifts=0,
                    overlap=0.25,
                    split=False):
-    indexes = range(rank, 3, world_size)
+    indexes = range(rank, 15, world_size)
     epoch = 0
     tq = tqdm.tqdm(indexes,
                    ncols=120,
@@ -156,7 +156,7 @@ def evaluate_2(dataset,
                 sources_np = sources_np[:5, ...]
                 estimates_np = estimates_np[:5, ...]
                 
-            metrics_dict = get_metrics(mix_np, sources_np, estimates_np, sample_rate=16000, metrics_list='all')
+            metrics_dict = get_metrics(mix_np, sources_np, estimates_np, sample_rate=16000, metrics_list=['si_sdr','stoi','pesq'])
             metrics_dict["id"] = index
             
             df = pd.concat([df, pd.DataFrame([metrics_dict])], ignore_index=True);

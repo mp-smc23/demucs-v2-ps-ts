@@ -50,4 +50,4 @@ trap 'term_handler' SIGTERM
 
 # Run Singularity and execute commands inside the container
 
-srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./demucs.sif python3 run.py --save_model -b 128 -e 120 --SISDR --repeat 1 --repitch 0 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/mad --musdb /ceph/home/student.aau.dk/xg64zo/smc10/old_convs/noaug
+srun --output="${outfile}" --error="${errfile}" singularity exec --nv ./demucs.sif python3 run.py --test mads-noaug.th -b 128 -e 120 --SISDR --repeat 1 --repitch 0 --audio_channels 1 --wav /ceph/home/student.aau.dk/xg64zo/smc10/mad --musdb /ceph/home/student.aau.dk/xg64zo/smc10/old_convs/noaug
